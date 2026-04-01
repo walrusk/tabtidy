@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "node ./scripts/build.mjs && tsc --project tsconfig.json",
+    "bundle": "./scripts/bundle.sh",
     "test": "npm run build && node --test"
   },
   "devDependencies": {
