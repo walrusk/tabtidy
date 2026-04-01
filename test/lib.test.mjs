@@ -31,28 +31,31 @@ test("toLocalDayKey formats a local date as YYYY-MM-DD", () => {
 
 test("createClosedTabCaptures filters pinned tabs and fills missing values", () => {
   const now = new Date(2026, 3, 1, 9, 30, 0);
-  const captures = createClosedTabCaptures([
-    {
-      id: 1,
-      pinned: false,
-      title: "  Planning doc  ",
-      url: "https://example.com/planning",
-    },
-    {
-      id: 2,
-      pinned: false,
-    },
-    {
-      id: 3,
-      pinned: true,
-      title: "Pinned tab",
-      url: "https://example.com/pinned",
-    },
-    {
-      title: "Missing id",
-      url: "https://example.com/no-id",
-    },
-  ], now);
+  const captures = createClosedTabCaptures(
+    [
+      {
+        id: 1,
+        pinned: false,
+        title: "  Planning doc  ",
+        url: "https://example.com/planning",
+      },
+      {
+        id: 2,
+        pinned: false,
+      },
+      {
+        id: 3,
+        pinned: true,
+        title: "Pinned tab",
+        url: "https://example.com/pinned",
+      },
+      {
+        title: "Missing id",
+        url: "https://example.com/no-id",
+      },
+    ],
+    { now },
+  );
 
   assert.equal(captures.length, 2);
   assert.deepEqual(captures[0], {
@@ -73,6 +76,34 @@ test("createClosedTabCaptures filters pinned tabs and fills missing values", () 
       dayKey: "2026-04-01",
     },
   });
+});
+
+test("createClosedTabCaptures skips excluded URLs such as the history page", () => {
+  const now = new Date(2026, 3, 1, 9, 30, 0);
+  const captures = createClosedTabCaptures(
+    [
+      {
+        id: 10,
+        pinned: false,
+        title: "TabTidy",
+        url: "chrome-extension://abc123/tabtidy.html",
+      },
+      {
+        id: 11,
+        pinned: false,
+        title: "Regular tab",
+        url: "https://example.com/work",
+      },
+    ],
+    {
+      now,
+      excludedUrls: ["chrome-extension://abc123/tabtidy.html"],
+    },
+  );
+
+  assert.equal(captures.length, 1);
+  assert.equal(captures[0].tabId, 11);
+  assert.equal(captures[0].record.title, "Regular tab");
 });
 
 test("appendClosedTabRecords merges onto existing history and ignores invalid values", async () => {

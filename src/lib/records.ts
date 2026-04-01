@@ -10,17 +10,28 @@ const UNTITLED_TAB = "Untitled tab";
 
 export function createClosedTabCaptures(
   tabs: ChromeTabLike[],
-  now: Date = new Date(),
+  options: {
+    now?: Date;
+    excludedUrls?: string[];
+  } = {},
 ): ClosedTabCapture[] {
+  const now = options.now ?? new Date();
   const closedAt = now.toISOString();
   const dayKey = toLocalDayKey(now);
+  const excludedUrls = new Set(
+    (options.excludedUrls ?? []).map((url) => normalizeUrl(url)),
+  );
 
   return tabs.flatMap((tab) => {
-    if (tab.pinned || typeof tab.id !== "number") {
+    const url = normalizeUrl(tab.url);
+
+    if (
+      tab.pinned ||
+      typeof tab.id !== "number" ||
+      excludedUrls.has(url)
+    ) {
       return [];
     }
-
-    const url = normalizeUrl(tab.url);
 
     return [
       {
