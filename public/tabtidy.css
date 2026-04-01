@@ -33,11 +33,16 @@ body {
 }
 
 .hero {
+  display: grid;
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.hero-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
-  margin-bottom: 24px;
 }
 
 .hero-copy {
@@ -75,6 +80,46 @@ body {
   line-height: 1.6;
 }
 
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.hero-button {
+  border: 1px solid rgba(31, 79, 143, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--page-accent);
+  padding: 9px 15px;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.hero-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(31, 79, 143, 0.28);
+}
+
+.hero-button-clear {
+  color: #8b3043;
+  border-color: rgba(139, 48, 67, 0.18);
+}
+
+.hero-button-clear:hover {
+  border-color: rgba(139, 48, 67, 0.28);
+}
+
+.hero-button:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
 .message-card,
 .day-group {
   background: var(--card-bg);
@@ -92,10 +137,39 @@ body {
   padding: 20px 22px;
 }
 
+.day-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .day-heading {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 1.05rem;
   line-height: 1.4;
+}
+
+.day-delete {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--page-accent);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transform: translateY(3px);
+}
+
+.day-delete:hover {
+  color: #143b70;
+}
+
+.day-delete:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .tab-list {
@@ -190,12 +264,21 @@ body {
     padding: 28px 0 32px;
   }
 
-  .hero {
+  .hero-top {
     gap: 16px;
   }
 
   .hero-icon {
     width: 68px;
+  }
+
+  .hero-actions {
+    gap: 8px;
+  }
+
+  .hero-button {
+    width: 100%;
+    max-width: 14rem;
   }
 
   .day-group {

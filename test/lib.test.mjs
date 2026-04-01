@@ -1,13 +1,19 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import {
+  createHistoryExportFilename,
+  createHistoryExportHtml,
+} from "../dist/lib/export.js";
 import { toLocalDayKey } from "../dist/lib/date.js";
 import { createClosedTabCaptures, groupClosedTabRecords } from "../dist/lib/records.js";
 import {
   appendClosedTabRecords,
+  clearClosedTabRecords,
   CLOSED_TABS_STORAGE_KEY,
   readClosedTabRecords,
   removeClosedTabRecord,
+  removeClosedTabRunRecords,
 } from "../dist/lib/storage.js";
 
 class FakeStorageArea {
@@ -158,6 +164,64 @@ test("removeClosedTabRecord deletes one matching saved tab at a time", async () 
   assert.equal(nextRecords[1].title, "Keep");
 });
 
+test("clearClosedTabRecords removes every saved tab record", async () => {
+  const storageArea = new FakeStorageArea({
+    [CLOSED_TABS_STORAGE_KEY]: [
+      {
+        url: "https://example.com/one",
+        title: "One",
+        closedAt: "2026-04-01T15:30:00.000Z",
+        dayKey: "2026-04-01",
+      },
+      {
+        url: "https://example.com/two",
+        title: "Two",
+        closedAt: "2026-04-01T15:35:00.000Z",
+        dayKey: "2026-04-01",
+      },
+    ],
+  });
+
+  const nextRecords = await clearClosedTabRecords(storageArea);
+  const storedRecords = await readClosedTabRecords(storageArea);
+
+  assert.deepEqual(nextRecords, []);
+  assert.deepEqual(storedRecords, []);
+});
+
+test("removeClosedTabRunRecords removes all records from one saved section", async () => {
+  const storageArea = new FakeStorageArea({
+    [CLOSED_TABS_STORAGE_KEY]: [
+      {
+        url: "https://example.com/one",
+        title: "One",
+        closedAt: "2026-04-01T15:30:00.000Z",
+        dayKey: "2026-04-01",
+      },
+      {
+        url: "https://example.com/two",
+        title: "Two",
+        closedAt: "2026-04-01T15:30:00.000Z",
+        dayKey: "2026-04-01",
+      },
+      {
+        url: "https://example.com/keep",
+        title: "Keep",
+        closedAt: "2026-04-01T15:35:00.000Z",
+        dayKey: "2026-04-01",
+      },
+    ],
+  });
+
+  const nextRecords = await removeClosedTabRunRecords(
+    storageArea,
+    "2026-04-01T15:30:00.000Z",
+  );
+
+  assert.equal(nextRecords.length, 1);
+  assert.equal(nextRecords[0].title, "Keep");
+});
+
 test("groupClosedTabRecords groups tabs by tidy run and sorts newest runs first", () => {
   const groups = groupClosedTabRecords([
     {
@@ -195,4 +259,37 @@ test("groupClosedTabRecords groups tabs by tidy run and sorts newest runs first"
     "Latest run A",
   ]);
   assert.equal(groups[2].closedAt, "2026-03-30T10:00:00.000Z");
+});
+
+test("createHistoryExportFilename creates a timestamped html file name", () => {
+  const fileName = createHistoryExportFilename(new Date(2026, 3, 1, 9, 5, 0));
+
+  assert.equal(fileName, "tabtidy-history-2026-04-01-0905.html");
+});
+
+test("createHistoryExportHtml builds a standalone html snapshot", () => {
+  const html = createHistoryExportHtml(
+    [
+      {
+        url: "https://example.com/?a=1&b=2",
+        title: "Work <Inbox>",
+        closedAt: "2026-04-01T10:15:00.000Z",
+        dayKey: "2026-04-01",
+      },
+      {
+        url: "",
+        title: "Untitled",
+        closedAt: "2026-04-01T10:15:00.000Z",
+        dayKey: "2026-04-01",
+      },
+    ],
+    "en-CA",
+    new Date("2026-04-01T11:00:00.000Z"),
+  );
+
+  assert.match(html, /<!doctype html>/i);
+  assert.match(html, /TabTidy Saved Tab List/);
+  assert.match(html, /Work &lt;Inbox&gt;/);
+  assert.match(html, /https:\/\/example\.com\/\?a=1&amp;b=2/);
+  assert.match(html, /No URL was available for this tab\./);
 });

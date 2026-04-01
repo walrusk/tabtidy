@@ -47,6 +47,31 @@ export async function removeClosedTabRecord(
   return nextRecords;
 }
 
+export async function clearClosedTabRecords(
+  storageArea: StorageAreaLike,
+): Promise<ClosedTabRecord[]> {
+  const nextRecords: ClosedTabRecord[] = [];
+  await storageArea.set({ [CLOSED_TABS_STORAGE_KEY]: nextRecords });
+
+  return nextRecords;
+}
+
+export async function removeClosedTabRunRecords(
+  storageArea: StorageAreaLike,
+  closedAt: string,
+): Promise<ClosedTabRecord[]> {
+  const existingRecords = await readClosedTabRecords(storageArea);
+  const nextRecords = existingRecords.filter((record) => record.closedAt !== closedAt);
+
+  if (nextRecords.length === existingRecords.length) {
+    return existingRecords;
+  }
+
+  await storageArea.set({ [CLOSED_TABS_STORAGE_KEY]: nextRecords });
+
+  return nextRecords;
+}
+
 function isSameClosedTabRecord(
   left: ClosedTabRecord,
   right: ClosedTabRecord,
