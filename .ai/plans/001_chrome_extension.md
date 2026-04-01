@@ -8,7 +8,7 @@ Build the first working TabTidy Chrome extension as a vanilla TypeScript Manifes
 2. Scaffold a no-framework MV3 extension with a small TypeScript build setup, a background service worker for the toolbar action, and a bundled `tabtidy.html` history page.
 3. Add manifest permissions for `tabs` and `storage`, register `tabtidy.html` as the extension’s history/options page, and use the committed icon assets under `public/icons/`.
 4. Implement the action flow: query tabs in the current window, preserve any already-open `tabtidy.html` tab, ensure the history page is available before closing tabs, capture `{ url, title, closedAt, dayKey }` for each other tab being closed, append those records to a single `chrome.storage.local` collection, close only the remaining non-pinned tabs, and reload any open history page tabs so the new records are visible.
-5. Implement the history page to load stored records, group them by tidy run using their shared `closedAt` timestamp, sort newest run first, render simple bulleted link lists with empty-state handling, and let the user delete a saved entry immediately with an `x` button.
+5. Implement the history page to load stored records, group them by tidy run using their shared `closedAt` timestamp, sort newest run first, render session cards without an extra outer container, keep each saved entry on one line with a truncated URL after the title, and let the user delete a saved entry immediately with a simple `×` button.
 6. Keep the action logic, storage/date helpers, and page rendering separated so the non-Chrome logic can be unit-tested cleanly.
 
 ## Public Interfaces / Types

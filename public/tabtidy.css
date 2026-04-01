@@ -59,17 +59,12 @@ body {
   line-height: 1.6;
 }
 
-.history-card,
 .message-card,
 .day-group {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: 22px;
   box-shadow: var(--shadow);
-}
-
-.history-card {
-  padding: 24px;
 }
 
 [data-history-root] {
@@ -100,17 +95,28 @@ body {
 
 .tab-entry-row {
   display: flex;
-  align-items: flex-start;
+  align-items: baseline;
   justify-content: space-between;
   gap: 16px;
 }
 
+.tab-entry-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+
 .tab-title {
-  display: block;
   color: var(--link);
   font-weight: 600;
   text-decoration: none;
-  word-break: break-word;
+  flex-shrink: 0;
+  max-width: min(45%, 20rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab-title:hover {
@@ -118,28 +124,30 @@ body {
 }
 
 .tab-url {
-  margin: 6px 0 0;
+  margin: 0;
   color: var(--text-secondary);
   font-size: 0.92rem;
   line-height: 1.45;
-  word-break: break-all;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .tab-delete {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(31, 79, 143, 0.2);
-  border-radius: 999px;
-  background: var(--page-accent-soft);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--page-accent);
-  font: inherit;
-  font-weight: 700;
+  font-size: 1.6rem;
+  line-height: 1;
   cursor: pointer;
 }
 
 .tab-delete:hover {
-  background: #cdddf1;
+  color: #143b70;
 }
 
 .tab-delete:disabled {
@@ -163,17 +171,11 @@ body {
     padding: 28px 0 32px;
   }
 
-  .history-card {
-    padding: 16px;
-  }
-
   .day-group {
     padding: 16px 18px;
   }
 
-  .tab-entry-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+  .tab-title {
+    max-width: min(50%, 11rem);
   }
 }

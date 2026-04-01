@@ -65,6 +65,9 @@ function createTabEntry(
   const row = document.createElement("div");
   row.className = "tab-entry-row";
 
+  const main = document.createElement("div");
+  main.className = "tab-entry-main";
+
   const titleElement = record.url
     ? document.createElement("a")
     : document.createElement("span");
@@ -81,19 +84,19 @@ function createTabEntry(
   const deleteButton = document.createElement("button");
   deleteButton.className = "tab-delete";
   deleteButton.type = "button";
-  deleteButton.textContent = "x";
+  deleteButton.innerHTML = "&times;";
   deleteButton.setAttribute("aria-label", `Delete ${record.title}`);
   deleteButton.addEventListener("click", () => {
     void handleDeleteRecord(record, deleteButton, container);
   });
 
-  row.append(titleElement, deleteButton);
-
   const urlLine = document.createElement("p");
   urlLine.className = "tab-url";
   urlLine.textContent = record.url || "No URL was available for this tab.";
 
-  item.append(row, urlLine);
+  main.append(titleElement, urlLine);
+  row.append(main, deleteButton);
+  item.append(row);
 
   return item;
 }
