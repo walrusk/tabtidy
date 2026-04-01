@@ -91,6 +91,7 @@ body {
 
 .tab-entry {
   color: var(--text-primary);
+  min-width: 0;
 }
 
 .tab-entry-row {
@@ -98,6 +99,7 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
 }
 
 .tab-entry-main {
@@ -106,6 +108,7 @@ body {
   gap: 8px;
   min-width: 0;
   flex: 1;
+  overflow: hidden;
 }
 
 .tab-title {
