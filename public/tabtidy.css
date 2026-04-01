@@ -84,6 +84,7 @@ body {
 .day-heading {
   margin: 0 0 16px;
   font-size: 1.05rem;
+  line-height: 1.4;
 }
 
 .tab-list {
@@ -99,12 +100,13 @@ body {
 
 .tab-entry-row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
 }
 
 .tab-title {
+  display: block;
   color: var(--link);
   font-weight: 600;
   text-decoration: none;
@@ -115,18 +117,34 @@ body {
   text-decoration: underline;
 }
 
-.tab-time {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
 .tab-url {
   margin: 6px 0 0;
   color: var(--text-secondary);
   font-size: 0.92rem;
   line-height: 1.45;
   word-break: break-all;
+}
+
+.tab-delete {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(31, 79, 143, 0.2);
+  border-radius: 999px;
+  background: var(--page-accent-soft);
+  color: var(--page-accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab-delete:hover {
+  background: #cdddf1;
+}
+
+.tab-delete:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 
 .message-card {

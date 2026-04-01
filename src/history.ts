@@ -1,7 +1,7 @@
-import { formatClosedTime, formatDayHeading } from "./lib/date.js";
+import { formatRunHeading } from "./lib/date.js";
 import { groupClosedTabRecords } from "./lib/records.js";
-import { readClosedTabRecords } from "./lib/storage.js";
-import type { ClosedTabDayGroup, ClosedTabRecord } from "./types.js";
+import { readClosedTabRecords, removeClosedTabRecord } from "./lib/storage.js";
+import type { ClosedTabRecord, ClosedTabRunGroup } from "./types.js";
 
 const historyRoot = document.querySelector<HTMLElement>("[data-history-root]");
 
@@ -21,7 +21,9 @@ async function renderHistory(container: HTMLElement): Promise<void> {
       return;
     }
 
-    container.replaceChildren(...groups.map((group) => createDaySection(group)));
+    container.replaceChildren(
+      ...groups.map((group) => createRunSection(group, container)),
+    );
   } catch (error) {
     container.replaceChildren(
       createMessageCard("Tab history could not be loaded right now."),
@@ -30,19 +32,22 @@ async function renderHistory(container: HTMLElement): Promise<void> {
   }
 }
 
-function createDaySection(group: ClosedTabDayGroup): HTMLElement {
+function createRunSection(
+  group: ClosedTabRunGroup,
+  container: HTMLElement,
+): HTMLElement {
   const section = document.createElement("section");
   section.className = "day-group";
 
   const heading = document.createElement("h2");
   heading.className = "day-heading";
-  heading.textContent = formatDayHeading(group.dayKey, navigator.language);
+  heading.textContent = formatRunHeading(group.closedAt, navigator.language);
 
   const list = document.createElement("ul");
   list.className = "tab-list";
 
   for (const record of group.records) {
-    list.append(createTabEntry(record));
+    list.append(createTabEntry(record, container));
   }
 
   section.append(heading, list);
@@ -50,7 +55,10 @@ function createDaySection(group: ClosedTabDayGroup): HTMLElement {
   return section;
 }
 
-function createTabEntry(record: ClosedTabRecord): HTMLLIElement {
+function createTabEntry(
+  record: ClosedTabRecord,
+  container: HTMLElement,
+): HTMLLIElement {
   const item = document.createElement("li");
   item.className = "tab-entry";
 
@@ -70,12 +78,16 @@ function createTabEntry(record: ClosedTabRecord): HTMLLIElement {
     titleElement.rel = "noreferrer";
   }
 
-  const timestamp = document.createElement("time");
-  timestamp.className = "tab-time";
-  timestamp.dateTime = record.closedAt;
-  timestamp.textContent = formatClosedTime(record.closedAt, navigator.language);
+  const deleteButton = document.createElement("button");
+  deleteButton.className = "tab-delete";
+  deleteButton.type = "button";
+  deleteButton.textContent = "x";
+  deleteButton.setAttribute("aria-label", `Delete ${record.title}`);
+  deleteButton.addEventListener("click", () => {
+    void handleDeleteRecord(record, deleteButton, container);
+  });
 
-  row.append(titleElement, timestamp);
+  row.append(titleElement, deleteButton);
 
   const urlLine = document.createElement("p");
   urlLine.className = "tab-url";
@@ -84,6 +96,22 @@ function createTabEntry(record: ClosedTabRecord): HTMLLIElement {
   item.append(row, urlLine);
 
   return item;
+}
+
+async function handleDeleteRecord(
+  record: ClosedTabRecord,
+  deleteButton: HTMLButtonElement,
+  container: HTMLElement,
+): Promise<void> {
+  deleteButton.disabled = true;
+
+  try {
+    await removeClosedTabRecord(chrome.storage.local, record);
+    await renderHistory(container);
+  } catch (error) {
+    deleteButton.disabled = false;
+    console.error("TabTidy failed to delete a saved tab.", error);
+  }
 }
 
 function createMessageCard(message: string): HTMLElement {

@@ -22,7 +22,7 @@ export type StorageAreaLike = {
   set(items: Record<string, unknown>): Promise<void>;
 };
 
-export type ClosedTabDayGroup = {
-  dayKey: string;
+export type ClosedTabRunGroup = {
+  closedAt: string;
   records: ClosedTabRecord[];
 };

@@ -6,20 +6,12 @@ export function toLocalDayKey(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function formatDayHeading(dayKey: string, locale: string): string {
-  const [year, month, day] = dayKey.split("-").map(Number);
-  const date = new Date(year, month - 1, day);
-
+export function formatRunHeading(isoDate: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
-  }).format(date);
-}
-
-export function formatClosedTime(isoDate: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
     hour: "numeric",
     minute: "2-digit",
   }).format(new Date(isoDate));

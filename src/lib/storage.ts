@@ -26,3 +26,35 @@ export async function appendClosedTabRecords(
 
   return nextRecords;
 }
+
+export async function removeClosedTabRecord(
+  storageArea: StorageAreaLike,
+  recordToRemove: ClosedTabRecord,
+): Promise<ClosedTabRecord[]> {
+  const existingRecords = await readClosedTabRecords(storageArea);
+  const recordIndex = existingRecords.findIndex((record) =>
+    isSameClosedTabRecord(record, recordToRemove),
+  );
+
+  if (recordIndex === -1) {
+    return existingRecords;
+  }
+
+  const nextRecords = [...existingRecords];
+  nextRecords.splice(recordIndex, 1);
+  await storageArea.set({ [CLOSED_TABS_STORAGE_KEY]: nextRecords });
+
+  return nextRecords;
+}
+
+function isSameClosedTabRecord(
+  left: ClosedTabRecord,
+  right: ClosedTabRecord,
+): boolean {
+  return (
+    left.url === right.url &&
+    left.title === right.title &&
+    left.closedAt === right.closedAt &&
+    left.dayKey === right.dayKey
+  );
+}

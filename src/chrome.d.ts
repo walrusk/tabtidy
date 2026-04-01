@@ -41,6 +41,7 @@ declare const chrome: {
   tabs: {
     create(createProperties: ChromeTabCreateProperties): Promise<ChromeTab>;
     query(queryInfo: ChromeTabQueryInfo): Promise<ChromeTab[]>;
+    reload(tabId: number): Promise<void>;
     remove(tabIds: number[]): Promise<void>;
     update(
       tabId: number,

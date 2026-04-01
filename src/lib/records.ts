@@ -1,8 +1,8 @@
 import type {
   ChromeTabLike,
   ClosedTabCapture,
-  ClosedTabDayGroup,
   ClosedTabRecord,
+  ClosedTabRunGroup,
 } from "../types.js";
 import { toLocalDayKey } from "./date.js";
 
@@ -63,39 +63,28 @@ export function sanitizeClosedTabRecords(value: unknown): ClosedTabRecord[] {
 
 export function groupClosedTabRecords(
   records: ClosedTabRecord[],
-): ClosedTabDayGroup[] {
+) : ClosedTabRunGroup[] {
   const groups = new Map<string, ClosedTabRecord[]>();
 
-  for (const record of [...records].sort(compareRecordsNewestFirst)) {
-    const group = groups.get(record.dayKey);
+  for (const record of records) {
+    const group = groups.get(record.closedAt);
 
     if (group) {
       group.push(record);
       continue;
     }
 
-    groups.set(record.dayKey, [record]);
+    groups.set(record.closedAt, [record]);
   }
 
-  return [...groups.entries()].map(([dayKey, dayRecords]) => ({
-    dayKey,
-    records: dayRecords,
-  }));
-}
-
-function compareRecordsNewestFirst(
-  left: ClosedTabRecord,
-  right: ClosedTabRecord,
-): number {
-  if (left.dayKey !== right.dayKey) {
-    return right.dayKey.localeCompare(left.dayKey);
-  }
-
-  if (left.closedAt !== right.closedAt) {
-    return right.closedAt.localeCompare(left.closedAt);
-  }
-
-  return left.title.localeCompare(right.title);
+  return [...groups.entries()]
+    .sort(([leftClosedAt], [rightClosedAt]) =>
+      rightClosedAt.localeCompare(leftClosedAt),
+    )
+    .map(([closedAt, runRecords]) => ({
+      closedAt,
+      records: runRecords,
+    }));
 }
 
 function normalizeTitle(title: string | undefined, url: string): string {

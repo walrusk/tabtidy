@@ -7,6 +7,7 @@ import {
   appendClosedTabRecords,
   CLOSED_TABS_STORAGE_KEY,
   readClosedTabRecords,
+  removeClosedTabRecord,
 } from "../dist/lib/storage.js";
 
 class FakeStorageArea {
@@ -130,31 +131,68 @@ test("appendClosedTabRecords merges onto existing history and ignores invalid va
   assert.deepEqual(storedRecords, [existingRecord, newRecord]);
 });
 
-test("groupClosedTabRecords sorts newest days and newest records first", () => {
+test("removeClosedTabRecord deletes one matching saved tab at a time", async () => {
+  const duplicateRecord = {
+    url: "https://example.com/duplicate",
+    title: "Duplicate",
+    closedAt: "2026-04-01T15:30:00.000Z",
+    dayKey: "2026-04-01",
+  };
+  const storageArea = new FakeStorageArea({
+    [CLOSED_TABS_STORAGE_KEY]: [
+      duplicateRecord,
+      duplicateRecord,
+      {
+        url: "https://example.com/keep",
+        title: "Keep",
+        closedAt: "2026-04-01T15:35:00.000Z",
+        dayKey: "2026-04-01",
+      },
+    ],
+  });
+
+  const nextRecords = await removeClosedTabRecord(storageArea, duplicateRecord);
+
+  assert.equal(nextRecords.length, 2);
+  assert.deepEqual(nextRecords[0], duplicateRecord);
+  assert.equal(nextRecords[1].title, "Keep");
+});
+
+test("groupClosedTabRecords groups tabs by tidy run and sorts newest runs first", () => {
   const groups = groupClosedTabRecords([
+    {
+      url: "https://example.com/earlier-run-a",
+      title: "Earlier run A",
+      closedAt: "2026-04-01T08:00:00.000Z",
+      dayKey: "2026-04-01",
+    },
+    {
+      url: "https://example.com/latest-run-a",
+      title: "Latest run A",
+      closedAt: "2026-04-01T08:00:00.000Z",
+      dayKey: "2026-04-01",
+    },
+    {
+      url: "https://example.com/latest-run-b",
+      title: "Latest run B",
+      closedAt: "2026-04-01T10:15:00.000Z",
+      dayKey: "2026-04-01",
+    },
     {
       url: "https://example.com/older-day",
       title: "Older day",
       closedAt: "2026-03-30T10:00:00.000Z",
       dayKey: "2026-03-30",
     },
-    {
-      url: "https://example.com/newer-day-early",
-      title: "Newer day early",
-      closedAt: "2026-04-01T08:00:00.000Z",
-      dayKey: "2026-04-01",
-    },
-    {
-      url: "https://example.com/newer-day-late",
-      title: "Newer day late",
-      closedAt: "2026-04-01T10:15:00.000Z",
-      dayKey: "2026-04-01",
-    },
   ]);
 
-  assert.equal(groups.length, 2);
-  assert.equal(groups[0].dayKey, "2026-04-01");
-  assert.equal(groups[0].records[0].title, "Newer day late");
-  assert.equal(groups[0].records[1].title, "Newer day early");
-  assert.equal(groups[1].dayKey, "2026-03-30");
+  assert.equal(groups.length, 3);
+  assert.equal(groups[0].closedAt, "2026-04-01T10:15:00.000Z");
+  assert.equal(groups[0].records[0].title, "Latest run B");
+  assert.equal(groups[1].closedAt, "2026-04-01T08:00:00.000Z");
+  assert.deepEqual(groups[1].records.map((record) => record.title), [
+    "Earlier run A",
+    "Latest run A",
+  ]);
+  assert.equal(groups[2].closedAt, "2026-03-30T10:00:00.000Z");
 });
