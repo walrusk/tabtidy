@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>TabTidy History</title>
+    <link rel="stylesheet" href="./tabtidy.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <p class="eyebrow">Browser housekeeping</p>
+        <h1>TabTidy</h1>
+        <p class="lede">
+          Closed tabs are grouped by day here, so you can quickly revisit what
+          was tidied away.
+        </p>
+      </header>
+
+      <main class="history-card">
+        <div data-history-root></div>
+      </main>
+    </div>
+
+    <script type="module" src="./history.js"></script>
+  </body>
+</html>

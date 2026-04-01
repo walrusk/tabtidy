@@ -15,3 +15,11 @@ This project is a chrome extension to help tidy up your tabs when you have too m
 
 - Use a businessy consistent businessy blue for the styling.
 - Use tabtidy.png for extension icon.
+
+## Development
+
+1. Run `npm install`.
+2. Run `npm test` to build the extension and run the unit tests.
+3. Load the unpacked extension from `dist/` in Chrome.
+4. Use the toolbar button to tidy the current window.
+5. Open the extension options page to view `tabtidy.html` history.

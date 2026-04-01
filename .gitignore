@@ -1,4 +1,6 @@
 .vscode
 .DS_Store
+dist
+node_modules
 
 scripts/.base-branch

@@ -1,0 +1,13 @@
+{
+  "name": "tabtidy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node ./scripts/build.mjs && tsc --project tsconfig.json",
+    "test": "npm run build && node --test"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.2"
+  }
+}
