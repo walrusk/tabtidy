@@ -33,18 +33,16 @@ body {
 }
 
 .hero {
-  margin-bottom: 24px;
-}
-
-.hero-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
+  margin-bottom: 24px;
 }
 
 .hero-copy {
   min-width: 0;
+  flex: 1;
 }
 
 .eyebrow {
@@ -192,8 +190,7 @@ body {
     padding: 28px 0 32px;
   }
 
-  .hero-top {
-    align-items: center;
+  .hero {
     gap: 16px;
   }
 
